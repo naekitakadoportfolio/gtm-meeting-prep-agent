@@ -1,3 +1,12 @@
+<p align="center"><img src="assets/banner.svg" alt="banner" width="100%"></p>
+
+<p align="center">
+<img src="https://img.shields.io/badge/Python-3.10+-5B3A3A?style=flat-square">
+<img src="https://img.shields.io/badge/tests-passing-F2A7C3?style=flat-square">
+<img src="https://img.shields.io/badge/data-fictional-FBE3EC?style=flat-square">
+<a href="https://sider.ai/agents/web-creator/share/695ea81100a621619985fdfb"><img src="https://img.shields.io/badge/Portfolio-Nae_Kitakado-F4B4CD?style=flat-square"></a>
+</p>
+
 # GTM Meeting-Prep Agent
 
 An AI agent that gets sales reps ready for account meetings in seconds. It pulls the most relevant account notes, asks an LLM for a **structured brief** (summary, risks, opportunities, next actions, confidence), checks the output against **guardrails**, and **hands off to a human** when it can't trust the result.
@@ -36,3 +45,6 @@ pytest -q
 
 ## Production next steps
 Swap the TF-IDF retriever for a vector database, pull notes live from Salesforce/HubSpot, and log every brief so adoption and accuracy can be measured.
+
+---
+<p align="center"><sub>Built by <b>Nae Kitakado</b>, AI Automation Consultant Â· <a href="https://www.linkedin.com/in/nae-k-203194265">LinkedIn</a> Â· <a href="https://sider.ai/agents/web-creator/share/695ea81100a621619985fdfb">Portfolio</a> Â· open to retainer &amp; part-time consulting</sub></p>
