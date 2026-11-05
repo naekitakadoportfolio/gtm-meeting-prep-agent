@@ -1,0 +1,76 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GTM Meeting-Prep Agent · Nae Kitakado</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--cocoa:#5B3A3A;--ink:#3E2A2F;--mauve:#8A6470;--blush:#FBE3EC;--pink:#F4B4CD;--rose:#F2A7C3;--card:#fff;--bg:#FDF4F7;--line:#F3D3DF}
+*{box-sizing:border-box}body{margin:0;font-family:'DM Sans',Inter,sans-serif;color:var(--ink);background:var(--bg)}
+.wrap{max-width:1080px;margin:0 auto;padding:24px 16px 48px}
+.hero{background:linear-gradient(120deg,var(--blush),var(--pink));border-radius:24px;padding:28px;position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;right:-60px;top:-60px;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.3)}
+.tag{display:inline-block;background:#fff;color:var(--cocoa);font-size:12px;letter-spacing:.14em;font-weight:600;border-radius:99px;padding:4px 12px}
+h1{color:var(--cocoa);font-size:clamp(28px,5vw,44px);margin:10px 0 6px;font-weight:600}
+.hero p{margin:0;max-width:640px;position:relative;z-index:1}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:20px}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}
+h2{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--cocoa);margin:0 0 12px}
+label{font-size:13px;font-weight:600;color:var(--mauve);display:block;margin:10px 0 4px}
+select,textarea,input{width:100%;font:inherit;border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff;color:var(--ink)}
+input[type=range],input[type=checkbox]{accent-color:var(--cocoa)}textarea{min-height:120px;resize:vertical}
+button{background:var(--cocoa);color:#fff;border:0;border-radius:99px;padding:11px 20px;font:inherit;font-weight:600;letter-spacing:.06em;cursor:pointer;margin-top:12px}
+button.ghost{background:#fff;color:var(--cocoa);border:1px solid var(--rose)}
+.pill{display:inline-block;border-radius:99px;padding:3px 10px;font-size:12px;font-weight:600;margin:2px}
+.high{background:#F9D0D6;color:#8A2C3A}.medium{background:#FCE6C8;color:#7A4E12}.low{background:#DDF1E4;color:#1E5A36}
+ul{padding-left:18px;margin:6px 0}li{margin:4px 0}li::marker{color:var(--rose)}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line)}th{color:var(--mauve)}
+.kpi{display:flex;gap:10px;flex-wrap:wrap}.kpi div{flex:1;min-width:120px;background:var(--blush);border-radius:14px;padding:12px}.kpi b{display:block;font-size:24px;color:var(--cocoa)}
+pre{background:#2E1F23;color:#FBE3EC;border-radius:12px;padding:12px;font-size:12px;overflow:auto;max-height:320px}
+footer{text-align:center;font-size:13px;color:var(--mauve);margin-top:28px}a{color:var(--cocoa)}
+.muted{color:var(--mauve);font-size:13px}
+</style></head><body><div class="wrap">
+<div class="hero"><span class="tag">LIVE DEMO</span><h1>GTM Meeting-Prep Agent</h1>
+<p>Pick an account, say what the meeting is about, and the agent pulls the most relevant notes (retrieval), builds a structured brief, and runs guardrail checks. If confidence is low, it flags the brief for human review.</p></div>
+<div class="grid">
+<div class="card"><h2>1 · Inputs</h2>
+<label>Account</label><select id="acc"></select>
+<label>Meeting focus (search query)</label><input id="q" value="renewal risk budget champion">
+<label>Account notes (edit or add your own)</label><textarea id="notes"></textarea>
+<button onclick="run()">GENERATE BRIEF</button> <button class="ghost" onclick="tryBad()">TEST A GUARDRAIL</button></div>
+<div class="card"><h2>2 · Structured brief</h2><div id="out" class="muted">Click Generate brief.</div></div>
+</div>
+<div class="grid"><div class="card"><h2>Retrieved context (ranked)</h2><table id="ctx"><tr><td class="muted">—</td></tr></table></div>
+<div class="card"><h2>Guardrail log</h2><div id="log" class="muted">No checks run yet.</div></div></div>
+<script>
+const A={"ACC-101":{name:"Northwind Health",arr:185000,renewal:"2027-01-31",opps:["Managed SOC upsell (Proposal, $42,000)"],notes:["2026-10-02 QBR: CIO happy with uptime, frustrated with ticket response times in September.","2026-10-20 Support: 3 P2 tickets on VPN latency, all resolved within SLA.","2026-10-28 Call: Champion Maria Chen mentioned budget review in December; wants SOC pricing before then.","2026-11-01 Email: Procurement asked for SOC 2 report and updated MSA."]},
+"ACC-102":{name:"Brightline Logistics",arr:96000,renewal:"2026-12-15",opps:[],notes:["2026-09-12 Call: New IT director hired, evaluating all vendors.","2026-10-05 Support: Escalation on backup restore failure, resolved after 30 hours.","2026-10-30 Usage: Portal logins down 40% month over month.","2026-11-03 Email: Champion Dev Patel left the company."]}};
+const $=id=>document.getElementById(id);
+for(const k in A)$("acc").add(new Option(`${A[k].name} (${k})`,k));
+$("acc").onchange=()=>$("notes").value=A[$("acc").value].notes.join("\n");$("acc").value="ACC-102";$("acc").onchange();
+const tok=t=>t.toLowerCase().match(/[a-z0-9]+/g)||[];
+function retrieve(docs,q,k=4){const df={};docs.forEach(d=>new Set(tok(d)).forEach(w=>df[w]=(df[w]||0)+1));const n=docs.length;
+ const vec=t=>{const tf={};tok(t).forEach(w=>tf[w]=(tf[w]||0)+1);for(const w in tf)tf[w]*=Math.log((n+1)/((df[w]||0)+1)+1);return tf};
+ const cos=(a,b)=>{let d=0,x=0,y=0;for(const w in a){d+=a[w]*(b[w]||0);x+=a[w]**2}for(const w in b)y+=b[w]**2;return x&&y?d/Math.sqrt(x*y):0};
+ const qv=vec(q);return docs.map((d,i)=>({d,s:cos(qv,vec(d))+0.01*i/n})).sort((a,b)=>b.s-a.s).slice(0,k)}
+const RISK=/left|down|escalat|frustrat|evaluating|failure|budget/i, BLOCK=/guarantee|discount of \d+%|free forever/i;
+function checks(b){const log=[];log.push(["Valid JSON schema",["summary","risks","opportunities","next_actions","confidence"].every(k=>k in b)]);
+ log.push(["No customer-facing promises",!BLOCK.test(JSON.stringify(b))]);log.push(["Confidence in 0–1",b.confidence>=0&&b.confidence<=1]);
+ log.push(["Every risk grounded in a source note",b.risks.every(r=>$("notes").value.includes(r))]);return log}
+function render(b,log){const pass=log.every(l=>l[1]);
+ $("log").innerHTML=log.map(([n,ok])=>`<div>${ok?"✅":"⛔"} ${n}</div>`).join("")+(pass?"":"<p><b>Blocked.</b> Brief routed to a human instead of the rep.</p>");
+ if(!pass){$("out").innerHTML="<span class='pill high'>NEEDS HUMAN REVIEW</span><p class='muted'>The draft failed a guardrail, so it was not shown to the rep.</p>";return}
+ const lvl=b.confidence<0.6?"medium":"low";
+ $("out").innerHTML=`<p><b>${b.summary}</b></p><span class="pill ${lvl}">confidence ${b.confidence}</span>${b.needs_human_review?'<span class="pill medium">human review suggested</span>':''}
+ <h2 style="margin-top:14px">Risks</h2><ul>${b.risks.map(r=>`<li>${r}</li>`).join("")||"<li>None found</li>"}</ul>
+ <h2>Opportunities</h2><ul>${b.opportunities.map(r=>`<li>${r}</li>`).join("")||"<li>None open</li>"}</ul>
+ <h2>Next actions</h2><ul>${b.next_actions.map(r=>`<li>${r}</li>`).join("")}</ul><details><summary class="muted">View JSON</summary><pre>${JSON.stringify(b,null,2)}</pre></details>`}
+function build(){const a=A[$("acc").value],docs=$("notes").value.split("\n").filter(Boolean),hits=retrieve(docs,$("q").value);
+ $("ctx").innerHTML="<tr><th>Score</th><th>Note</th></tr>"+hits.map(h=>`<tr><td>${h.s.toFixed(2)}</td><td>${h.d}</td></tr>`).join("");
+ const risks=hits.map(h=>h.d).filter(d=>RISK.test(d)),days=Math.round((new Date(a.renewal)-new Date())/864e5);
+ const next=[];if(/left/i.test(risks.join()))next.push("Identify and meet a new champion before renewal");if(/evaluating/i.test(risks.join()))next.push("Prepare a value recap for the new IT director");
+ if(/budget/i.test(risks.join()))next.push("Send pricing before the budget review");if(!next.length)next.push("Confirm priorities and propose expansion");
+ const conf=+(Math.max(0.35,0.9-0.12*risks.length)).toFixed(2);
+ return{summary:`${a.name} renews in ${days} days (${a.renewal}) at $${a.arr.toLocaleString()} ARR.`,risks,opportunities:a.opps,next_actions:next,confidence:conf,needs_human_review:conf<0.6}}
+function run(){const b=build();render(b,checks(b))}
+function tryBad(){const b=build();b.next_actions.push("Guarantee a discount of 30% if they renew today");render(b,checks(b))}
+run();
+</script>
+<footer>Built by <b>Nae Kitakado</b>, AI Automation Consultant · <a href="https://github.com/naekitakadoportfolio">GitHub</a> · <a href="https://www.linkedin.com/in/nae-k-203194265">LinkedIn</a> · <a href="https://sider.ai/agents/web-creator/share/695ea81100a621619985fdfb">Portfolio</a><br>All data is fictional. This demo runs entirely in your browser.</footer></div></body></html>

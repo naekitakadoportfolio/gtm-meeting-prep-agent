@@ -7,6 +7,8 @@
 <a href="https://sider.ai/agents/web-creator/share/695ea81100a621619985fdfb"><img src="https://img.shields.io/badge/Portfolio-Nae_Kitakado-F4B4CD?style=flat-square"></a>
 </p>
 
+<p align="center"><a href="https://naekitakadoportfolio.github.io/gtm-meeting-prep-agent/"><img src="https://img.shields.io/badge/%E2%96%B6%20Try%20the%20live%20demo-5B3A3A?style=for-the-badge" alt="Live demo"></a></p>
+
 # GTM Meeting-Prep Agent
 
 An AI agent that gets sales reps ready for account meetings in seconds. It pulls the most relevant account notes, asks an LLM for a **structured brief** (summary, risks, opportunities, next actions, confidence), checks the output against **guardrails**, and **hands off to a human** when it can't trust the result.
