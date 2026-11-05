@@ -1,0 +1,16 @@
+[
+ {"id":"ACC-101","name":"Northwind Health","industry":"Healthcare","arr":185000,"renewal_date":"2027-01-31","owner":"Jordan Lee",
+  "open_opps":[{"name":"Managed SOC upsell","stage":"Proposal","amount":42000}],
+  "notes":[
+   "2026-10-02 QBR: CIO happy with uptime, frustrated with ticket response times in September.",
+   "2026-10-20 Support: 3 P2 tickets on VPN latency, all resolved within SLA.",
+   "2026-10-28 Call: Champion Maria Chen mentioned budget review in December; wants SOC pricing before then.",
+   "2026-11-01 Email: Procurement asked for SOC 2 report and updated MSA."]},
+ {"id":"ACC-102","name":"Brightline Logistics","industry":"Logistics","arr":96000,"renewal_date":"2026-12-15","owner":"Sam Ortiz",
+  "open_opps":[],
+  "notes":[
+   "2026-09-12 Call: New IT director hired, evaluating all vendors.",
+   "2026-10-05 Support: Escalation on backup restore failure, resolved after 30 hours.",
+   "2026-10-30 Usage: Portal logins down 40% month over month.",
+   "2026-11-03 Email: Champion Dev Patel left the company."]}
+]
